@@ -7,11 +7,30 @@ BASE_URL="https://books.toscrape.com/catalogue/"
 START_URL="https://books.toscrape.com/catalogue/page-1.html"
 
 def scrape_books(url):
-    response=requests.get(url)
-    print(response)
-    soup=BeautifulSoup(response.text,"html.parser")
-    # print(soup.title)
-    books=soup.find_all("article")   
-    # print(len(books))
-    print(books[0].find("h3"))
-scrape_books(START_URL)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    books = soup.find_all("article")
+    
+    results = []
+    
+    for book in books:
+        title = book.find("h3").find("a")["title"]
+        price = book.find("p", class_="price_color").text.strip()
+        rating = book.find("p", class_="star-rating")["class"][1]
+        availability = book.find("p", class_="availability").text.strip()
+        
+        results.append({
+        "title": title,
+        "price": price,
+        "rating": rating,
+        "availability": availability
+        })
+
+    return pd.DataFrame(results)
+
+def save_data(df):
+    df.to_csv("data/books.csv",index=False)
+    print("Data saved to data/books.csv")
+
+df=scrape_books(START_URL)
+save_data(df)
