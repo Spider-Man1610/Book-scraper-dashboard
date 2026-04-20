@@ -32,15 +32,12 @@ def save_data(df):
     df.to_csv("data/books.csv",index=False)
     print("Data saved to data/books.csv")
 
-df=scrape_books(START_URL)
-save_data(df)
-
 all_books=[]
 
 for i in range(1,6):
     url=f"https://books.toscrape.com/catalogue/page-{i}.html"
     df=scrape_books(url)
     all_books.append(df)
-    print(url)
+    
 all=pd.concat(all_books)
 save_data(all)
